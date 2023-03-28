@@ -1,5 +1,4 @@
 const convert = require('xml-js')
-const cheerio = require('cheerio')
 
 const baseURI = 'https://tfr.faa.gov/save_pages/'
 
@@ -12,6 +11,7 @@ const tfrs = (module.exports = (...args) => {
  * Verify a date string matches the format mm/dd/yyyy
  */
 const isDate = text => {
+  if (!text) { return false; }
   const [ mm, dd, yyyy ] = text.split('/')
   if (!mm || mm.length !== 2 || !parseInt(mm)) {
     return false
@@ -33,46 +33,61 @@ tfrs.list = async () => {
     method: "GET"
   });
 
-  const $ = cheerio.load(await response.text())
-  const listingTable = $('body').find('table table')[2]
-  const rows = $(listingTable)
-    .find('tr')
-    .toArray()
+  const rows = [];
+  var current = [];
+  await new HTMLRewriter().on("tr", {
+    element(element) {
+      if (current.length > 0) {
+        rows.push(current);
+      }
+      console.log(element);
+      current = [];
+    }
+  }).on("tr a", {
+    element(element) {
+      current.push({
+        href: element.getAttribute('href'),
+        tagName: element.tagName
+      })
+    },
+    text(text) {
+      current[current.length - 1].text = (current[current.length - 1].text ?? "") + text.text;
+    }
+  }).transform(response).arrayBuffer();
+  if (current.length > 0) {
+    rows.push(current);
+  }
 
-  const results = rows.map(row => {
-    const columns = $(row)
-      .find('a')
-      .toArray()
-
-    const date = $(columns[0]).text()
+  const results = rows.map(columns => {
+    console.log(columns);
+    const date = columns[0].text
     if (!isDate(date)) {
-      return
+      return;
     }
 
     return {
       date,
-      notam: $(columns[1]).text(),
-      facility: $(columns[2]).text(),
-      state: $(columns[3]).text(),
-      type: $(columns[4]).text(),
-      description: $(columns[5])
-        .text()
+      notam: columns[1].text,
+      facility: columns[2].text,
+      state: columns[3].text,
+      type: columns[4].text,
+      description: columns[5]
+        .text
         .replace(/\n|\r/g, ''),
       links: {
-        details: $(columns[1])
-          .attr('href')
+        details: columns[1]
+          .href
           .replace('..', 'https://tfr.faa.gov')
           .replace(/\n|\r/g, ''),
-        zoom: `https://tfr.faa.gov${$(columns[6]).attr('href')}`,
-        xml: $(columns[1])
-          .attr('href')
+        zoom: columns[6] ? `https://tfr.faa.gov${columns[6].href}` : null,
+        xml: columns[1]
+          .href
           .replace('..', 'https://tfr.faa.gov')
           .replace('html', 'xml')
           .replace(/\n|\r/g, '')
       }
     }
-  })
-
+  });
   return results.filter(r => !!r)
 }
 
