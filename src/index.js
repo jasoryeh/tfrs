@@ -11,11 +11,21 @@ const tfrs = require('../index');
 
 export default {
 	async fetch(request, env, ctx) {
-		let tfrlist = await tfrs.list();
-		return new Response(JSON.stringify(tfrlist, null, 4), {
-			headers: {
-				"content-type": "application/json;charset=UTF-8"
-			}
-		});
+		let url = new URL(request.url);
+		let tfrID = url.pathname.replace('/', '');
+		if (tfrID == "") {
+			let tfrlist = await tfrs.list();
+			return new Response(JSON.stringify(tfrlist, null, 4), {
+				headers: {
+					"content-type": "application/json;charset=UTF-8"
+				}
+			});
+		} else {
+			return new Response(JSON.stringify(await tfrs.fetch(tfrID), null, 4), {
+				headers: {
+					"content-type": "application/json;charset=UTF-8"
+				}
+			});
+		}
 	},
 };

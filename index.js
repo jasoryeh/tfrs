@@ -300,21 +300,7 @@ const defaultOptions = {
  */
 tfrs.fetch = async (id, options = defaultOptions) => {
   try {
-    if (options.format === 'json') {
-      return fetchJson(id)
-    }
-    if (options.format === 'xml') {
-      const response = await fetch(`${baseURI}/detail_${id.split('/').join('_')}.xml`, {
-        method: "GET"
-      });
-      return await response.text()
-    }
-    if (options.format === 'aixm50') {
-      const response = await fetch(`${baseURI}/detail_${id.split('/').join('_')}.aixm50`, {
-        method: "GET"
-      });
-      return await response.text()
-    }
+    return fetchJson(id);
   } catch (err) {
     console.error(`Error fetching TFR values from ${baseURI}`, err)
   }
