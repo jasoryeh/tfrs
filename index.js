@@ -289,16 +289,9 @@ const fetchJson = async id => {
 }
 
 /**
- * Default fetch() options
- */
-const defaultOptions = {
-  format: 'json'
-}
-
-/**
  * Main fetching method used to get TFR details
  */
-tfrs.fetch = async (id, options = defaultOptions) => {
+tfrs.fetch = async (id) => {
   try {
     return fetchJson(id);
   } catch (err) {
