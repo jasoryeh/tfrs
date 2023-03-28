@@ -1,4 +1,3 @@
-const superagent = require('superagent')
 const convert = require('xml-js')
 const cheerio = require('cheerio')
 
@@ -30,11 +29,11 @@ const isDate = text => {
  * List all TFRs available on https://tfr.faa.gov
  */
 tfrs.list = async () => {
-  const response = await superagent
-    .get('https://tfr.faa.gov/tfr2/list.jsp')
-    .buffer()
+  const response = await fetch('https://tfr.faa.gov/tfr2/list.jsp', {
+    method: "GET"
+  });
 
-  const $ = cheerio.load(response.text)
+  const $ = cheerio.load(await response.text())
   const listingTable = $('body').find('table table')[2]
   const rows = $(listingTable)
     .find('tr')
@@ -259,12 +258,12 @@ const extractNot = not => ({
  * Fetch the XML version of the TFR and transform it into a simpler JSON format
  */
 const fetchJson = async id => {
-  const response = await superagent
-    .get(`${baseURI}/detail_${id.split('/').join('_')}.xml`)
-    .buffer()
+  const response = await fetch(`${baseURI}/detail_${id.split('/').join('_')}.xml`, {
+    method: "GET"
+  });
 
   const result = parse(
-    response.text.replace(/<txtDescrModern[\s\S]*txtDescrModern>/g, '')
+    (await response.text()).replace(/<txtDescrModern[\s\S]*txtDescrModern>/g, '')
   )
 
   return {
@@ -290,16 +289,16 @@ tfrs.fetch = async (id, options = defaultOptions) => {
       return fetchJson(id)
     }
     if (options.format === 'xml') {
-      const response = await superagent
-        .get(`${baseURI}/detail_${id.split('/').join('_')}.xml`)
-        .buffer()
-      return response.text
+      const response = await fetch(`${baseURI}/detail_${id.split('/').join('_')}.xml`, {
+        method: "GET"
+      });
+      return await response.text()
     }
     if (options.format === 'aixm50') {
-      const response = await superagent
-        .get(`${baseURI}/detail_${id.split('/').join('_')}.aixm50`)
-        .buffer()
-      return response.text
+      const response = await fetch(`${baseURI}/detail_${id.split('/').join('_')}.aixm50`, {
+        method: "GET"
+      });
+      return await response.text()
     }
   } catch (err) {
     console.error(`Error fetching TFR values from ${baseURI}`, err)
