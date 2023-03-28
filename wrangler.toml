@@ -2,3 +2,6 @@ name = "tfrs"
 main = "src/index.js"
 compatibility_date = "2023-03-28"
 node_compat = true
+kv_namespaces = [
+    { binding = "TFR_CACHE", id = "936056b346b94f03b50991bbdc9f54ef", preview_id = "5b807f529d3f471098cdeb25d86b1a49" }
+]
