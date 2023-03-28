@@ -1,5 +1,5 @@
 const tfrs = require('../index');
-const CACHE_TIME = 1000 * 60 * 10;
+const CACHE_TIME = 1000 * 60 * 60;
 
 const corsHeaders = {
 	"Access-Control-Allow-Origin": "*"
