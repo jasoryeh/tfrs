@@ -47,11 +47,16 @@ tfrs.list = async () => {
     element(element) {
       current.push({
         href: element.getAttribute('href'),
-        tagName: element.tagName
+        tagName: element.tagName,
+        new: false
       })
     },
     text(text) {
       current[current.length - 1].text = (current[current.length - 1].text ?? "") + text.text;
+    }
+  }).on("tr a font[color=red]", {
+    element(element) {
+      current[current.length - 1].new = true;
     }
   }).transform(response).arrayBuffer();
   if (current.length > 0) {
@@ -67,13 +72,16 @@ tfrs.list = async () => {
 
     return {
       date,
+      new: columns[5].new,
       notam: columns[1].text,
       facility: columns[2].text,
       state: columns[3].text,
       type: columns[4].text,
       description: columns[5]
         .text
-        .replace(/\n|\r/g, ''),
+        .replace(/\n|\r/g, '')
+        .replace(" New  ", "")
+        .trim(),
       links: {
         details: columns[1]
           .href
