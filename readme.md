@@ -4,78 +4,104 @@ Fetch temporary flight restrictions and related data from https://tfr.faa.gov
 
 [![NPM Version][npm-image]][npm-url]
 
-## Installation
-
-```console
-$ npm install --save @faa-aviation-data-portal/tfrs
+## Deploy
 ```
+$ wrangler publish
+```
+
+## Live
+Currently published to `https://tfrs.jasonho.workers.dev`
 
 ## Usage
+GET `/`
+  List the current TFRs.
+  ```json
+  [
+    {
+        "date": "03/28/2023",
+        "notam": "3/3194",
+        "facility": "ZTL",
+        "state": "GA",
+        "type": "SECURITY",
+        "description": "Augusta, GA, Saturday, April 01, 2023 through Sunday, April 09, 2023 Local New  ",
+        "links": {
+            "details": "https://tfr.faa.gov/save_pages/detail_3_3194.html",
+            "zoom": "https://tfr.faa.gov/tfr_map_ims/html/ew/scale3/tile_4_3.html",
+            "xml": "https://tfr.faa.gov/save_pages/detail_3_3194.xml"
+        }
+    },
+    ...
+  ]
+  ```
 
-```js
-tfrs.list().then(results => {
-  console.log(JSON.stringify(results, null, 2))
-})
-```
-
-### Partial Output
-
-```json
-[
+GET `/<NOTAM/ID>`
+  Get details for a specific TFR by NOTAM ID (e.g. Disney World: /4/3634).
+  ```json
   {
-    "date": "08/15/2019",
-    "notam": "9/2094",
-    "facility": "ZLA",
-    "state": "UT",
-    "type": "HAZARDS",
-    "description": "52NM SW OF ST. GEORGE, UT, Thursday, August 15, 2019 through Monday, September 30, 2019 UTC New  ",
-    "links": {
-      "details": "https://tfr.faa.gov/save_pages/detail_9_2094.html",
-      "zoom": "https://tfr.faa.gov/tfr_map_ims/html/cc/scale3/tile_2_3.html",
-      "xml": "https://tfr.faa.gov/save_pages/detail_9_2094.xml"
+    "id": "4/3634",
+    "created": "2023-03-21T14:32:19",
+    "accountableFacility": "FDC",
+    "indexYear": "2014",
+    "sequenceNumber": "3634",
+    "localName": "4/3634",
+    "guid": "a3b4391f-b089-4bde-be42-463bcd6ef4b9",
+    "dailyOperations": "false",
+    "dateIssued": "2014-10-27T14:57:00",
+    "dateEffective": "2014-10-27T15:00:00",
+    "dateExpires": null,
+    "timezone": "UTC",
+    "expirationTimezone": "UTC",
+    "facility": {
+        "id": "ZJX",
+        "type": "ARTCC",
+        "location": {
+            "city": "DISNEY WORLD THEME PARK, ORLANDO",
+            "state": "FLORIDA"
+        }
+    },
+    "poc": null,
+    "type": "99.7",
+    "airspace": {
+        "airspaceType": "RAS",
+        "airspaceId": "11448",
+        "name": "Area",
+        "distVerUpperCode": "HEI",
+        "distVerUpperValue": "3000",
+        "distVerUpperUnit": "FT",
+        "distVerLowerCode": "HEI",
+        "distVerLowerValue": "0",
+        "distVerLowerUnit": "FT",
+        "airspaceTimesheetWorkHr": "NOTAM",
+        "excludeVerUpper": "INCLUDE",
+        "excludeVerLower": "INCLUDE",
+        "isScheduledTfrArea": "FALSE",
+        "schedule": {
+            "isTimeSeparate": "FALSE",
+            "dateEffective": "2014-10-27T15:00:00",
+            "dateExpire": null
+        },
+        "boundary": {
+            "airspaceType": "RAS",
+            "airspaceId": "11448",
+            "remark": "11448",
+            "datum": "WGE",
+            "type": "GRC",
+            "vertices": [
+                [...], ... 
+            ]
+        },
+        "incFRD": "TRUE",
+        "shpPrt": "COMPOSITE",
+        "localTime": "TRUE",
+        "authATC": "FALSE"
+    },
+    "description": {
+        "freeFormText": "false",
+        "usns": "...",
+        "traditional": "..."
     }
-  },
-  ...
-]
-```
-
-## API
-
-### `tfrs.list()`
-
-### `tfrs.fetch(tfrId, options)`
-
-#### `tfrId`
-
-The TFR NOTAM ID, e.g., `9/2094`
-
-Type: `string`
-
-#### `options`
-
-Options to customize the results of the `fetch()` method
-
-Type: `object`
-
-Example:
-
-```json
-{
-  "format": "json"
 }
-```
-
-##### `options.format`
-
-Specify the format of the results. Note, not all formats contain the same information.
-
-Type: `string`
-
-Valid values:
-
-- `json`
-- `xml`
-- `aixm`
+  ```
 
 ## Contributing
 
