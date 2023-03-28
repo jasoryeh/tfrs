@@ -18,7 +18,7 @@ function cacheKey(key) {
 
 async function fromCacheOrElse(cache_namespace, key, populate) {
 	let cache_id = cacheKey(key);
-	var data = cache_namespace.get(cache_id);
+	var data = await cache_namespace.get(cache_id);
 	if (data == null) {
 		data = await populate();
 		await cache_namespace.put(cache_id, data, { expiration: parseInt((CACHE_TIME + new Date().getTime()) / 1000) });
